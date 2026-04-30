@@ -6,9 +6,7 @@ import { useCallback, useState } from 'react';
 
 export const useSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isSupported, setIsSupported] = useState(
-    'speechSynthesis' in window
-  );
+  const isSupported = 'speechSynthesis' in window;
 
   // Speak text
   const speak = useCallback((text, options = {}) => {

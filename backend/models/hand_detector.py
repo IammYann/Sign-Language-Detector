@@ -4,9 +4,9 @@ Detects hand landmarks from video frames
 """
 
 import cv2
-import mediapipe as mp
 import numpy as np
 from typing import Optional, Tuple, List
+import mediapipe as mp
 from utils.config import MIN_DETECTION_CONFIDENCE, MIN_TRACKING_CONFIDENCE
 
 
@@ -27,14 +27,23 @@ class HandDetector:
             min_tracking_confidence: Minimum confidence for hand tracking
             max_num_hands: Maximum number of hands to detect
         """
-        self.mp_hands = mp.solutions.hands
-        self.hands = self.mp_hands.Hands(
-            static_image_mode=False,
-            max_num_hands=max_num_hands,
-            min_detection_confidence=min_detection_confidence,
-            min_tracking_confidence=min_tracking_confidence
-        )
-        self.mp_drawing = mp.solutions.drawing_utils
+        # Use the old solutions API if available, otherwise fallback
+        try:
+            # Try old API first
+            self.hands = mp.solutions.hands.Hands(
+                static_image_mode=False,
+                max_num_hands=max_num_hands,
+                min_detection_confidence=min_detection_confidence,
+                min_tracking_confidence=min_tracking_confidence
+            )
+            self.mp_drawing = mp.solutions.drawing_utils
+            self.mp_hands = mp.solutions.hands
+            self.use_old_api = True
+        except AttributeError:
+            # Fallback to new tasks API
+            # For now, raise an error since we need to implement the new API properly
+            raise ImportError("MediaPipe solutions API not available. Please use MediaPipe version with solutions support.")
+
         self.landmarks_list = []
 
     def detect(self, frame: np.ndarray) -> Tuple[Optional[List], np.ndarray]:
@@ -47,6 +56,9 @@ class HandDetector:
         Returns:
             Tuple of (landmarks_list, annotated_frame)
         """
+        if not self.use_old_api:
+            raise NotImplementedError("New MediaPipe API not yet implemented")
+
         # Convert BGR to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.hands.process(rgb_frame)
@@ -125,4 +137,5 @@ class HandDetector:
 
     def release(self):
         """Release resources"""
-        self.hands.close()
+        if hasattr(self, 'hands') and self.use_old_api:
+            self.hands.close()
