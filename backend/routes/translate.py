@@ -20,6 +20,21 @@ hand_detector = HandDetector()
 gesture_recognizer = GestureRecognizer()
 
 
+@router.get("/health")
+async def health_check() -> Dict:
+    """
+    Health check endpoint
+    
+    Returns:
+        JSON with health status
+    """
+    return {
+        "status": "healthy",
+        "service": "Sign Language Translator API",
+        "version": "1.0.0"
+    }
+
+
 @router.post("/detect")
 async def detect_gesture(file: UploadFile = File(...)) -> Dict:
     """

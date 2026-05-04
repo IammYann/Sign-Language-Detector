@@ -53,7 +53,7 @@ async def get_supported_gestures():
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",
-        host="localhost",
+        host=API_HOST,
         port=API_PORT,
         reload=True
     )

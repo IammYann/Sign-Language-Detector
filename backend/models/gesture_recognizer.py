@@ -227,9 +227,32 @@ class GestureRecognizer:
         elif thumb > 0.6 and pinky > 0.7 and middle < 0.3:
             gesture = "Y"
             confidence = 0.85
+        
+        # D - index extended, others closed
+        elif index > 0.7 and middle < 0.4 and ring < 0.4 and pinky < 0.4 and thumb < 0.4:
+            gesture = "D"
+            confidence = 0.80
+        
+        # F - all fingers except index and thumb closed
+        elif index > 0.5 and middle < 0.3 and ring < 0.3 and pinky < 0.3:
+            gesture = "F"
+            confidence = 0.75
+        
+        # G - index and thumb extended
+        elif index > 0.7 and thumb > 0.6 and middle < 0.3 and ring < 0.3 and pinky < 0.3:
+            gesture = "G"
+            confidence = 0.80
+        
+        # W - index, middle, ring extended
+        elif index > 0.7 and middle > 0.7 and ring > 0.7 and pinky < 0.3:
+            gesture = "W"
+            confidence = 0.80
 
-        # Default confidence is low
-        confidence = max(confidence, 0.1)
+        # Default confidence is low for unknown gestures
+        if gesture == "Unknown":
+            confidence = 0.3
+        else:
+            confidence = max(confidence, 0.1)
 
         return gesture, confidence
 
